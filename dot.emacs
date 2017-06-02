@@ -87,3 +87,14 @@
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
 (define-key global-map "\M-Q" 'unfill-paragraph)
+
+
+
+;; (defun smart-beginning-of-line ()
+;;   (interactive)
+;;   (let ((oldpos (point)))
+;;     (back-to-indentation)
+;;     (and (= oldpos (point))
+;;          (beginning-of-line))))
+;; (global-set-key [home] 'smart-beginning-of-line)
+;; (global-set-key "\C-a" 'smart-beginning-of-line)
