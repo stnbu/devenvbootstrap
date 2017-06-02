@@ -87,3 +87,5 @@
         (emacs-lisp-docstring-fill-column t))
     (fill-paragraph nil region)))
 (define-key global-map "\M-Q" 'unfill-paragraph)
+
+(setq column-number-mode t)
