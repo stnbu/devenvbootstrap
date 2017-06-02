@@ -88,8 +88,6 @@
     (fill-paragraph nil region)))
 (define-key global-map "\M-Q" 'unfill-paragraph)
 
-
-
 ;; (defun smart-beginning-of-line ()
 ;;   (interactive)
 ;;   (let ((oldpos (point)))
@@ -98,3 +96,5 @@
 ;;          (beginning-of-line))))
 ;; (global-set-key [home] 'smart-beginning-of-line)
 ;; (global-set-key "\C-a" 'smart-beginning-of-line)
+
+(setq column-number-mode t)
