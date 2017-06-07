@@ -19,9 +19,9 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-install_prefix = os.path.expanduser('~')
+install_prefix = os.path.expanduser('~/.herp')
 #import tempfile#temp_dir = tempfile.mkdtemp()
-source_root = os.path.join(os.path.expanduser('~'), 'source')
+source_root = os.path.join(os.path.expanduser('~/.herp'), 'source')
 archive_name = 'emacs.tar.xz'
 emacs_url = 'https://mirrors.ocf.berkeley.edu/gnu/emacs/emacs-25.2.tar.xz'
 
@@ -48,6 +48,7 @@ def get_downloaded_emacs_archive_path(dest_path):
 
 
 def system(command):
+    #print(' '.join(command))
     p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     pout, perr = p.communicate()
     if p.returncode:
@@ -58,7 +59,7 @@ def system(command):
 def configure(path):
     logger.info('Configuring')
     os.chdir(path)
-    system(['./configure', '--prefix', install_prefix])
+    system(['./configure', '--prefix', install_prefix, '--without-x'])
 
 def make(path, target=None):
     cmd = []
