@@ -39,11 +39,11 @@
 (ac-config-default)
 (global-set-key (kbd "C-x g") 'magit-status)
 
-(setq-default fill-column 120)
+(setq-default fill-column 80)
 
 (server-start)
 
-(setq ispell-program-name "/usr/local/bin/ispell")
+(setq ispell-program-name "ispell")
 
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
