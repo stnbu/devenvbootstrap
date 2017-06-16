@@ -72,6 +72,9 @@ def make(path, target=None):
 
 
 if __name__ == '__main__':
+
+    if not os.path.exists(source_root):
+        os.makedirs(source_root)
     tarball_dir, tarball_name = get_downloaded_emacs_archive_path(source_root)
     tarball_path = os.path.join(tarball_dir, tarball_name)
     emacs_source_dir = os.path.join(source_root, 'emacs')
