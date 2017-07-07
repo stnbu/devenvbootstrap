@@ -78,6 +78,8 @@ if __name__ == '__main__':
     tarball_dir, tarball_name = get_downloaded_emacs_archive_path(source_root)
     tarball_path = os.path.join(tarball_dir, tarball_name)
     emacs_source_dir = os.path.join(source_root, 'emacs')
+    if not os.path.exists(emacs_source_dir):
+        os.makedirs(emacs_source_dir)
 
     extract_tarball(tarball_path, emacs_source_dir)
     this_version_source = os.path.join(emacs_source_dir, 'emacs-{0}'.format(get_version_string(emacs_url)))
@@ -85,3 +87,20 @@ if __name__ == '__main__':
     configure(this_version_source)
     make(this_version_source)
     make(this_version_source, 'install')
+
+    dot_emacs = os.path.expanduser('~/.emacs')
+    dot_bashrc = os.path.expanduser('~/.bashrc')
+    if not os.path.exists(dot_emacs):
+        os.symlink('git/devenvbootstrap/dot.emacs', dot_emacs)
+    if 'devenvbootstrap' not in open(dot_bashrc).read():
+        with open(dot_bashrc, 'a') as f:
+            f.write('\n. ~/git/devenvbootstrap/dot.bashrc\n')
+
+    system(['apt-get', '-yy', 'install', 'ipython'])
+
+    my_dir = os.path.dirname(os.path.abspath(__file__))
+    id_rsa_pub = open(os.path.join(my_dir, 'id_rsa.pub'), 'r').read().strip()
+    authorized_keys_path = os.path.expanduser('~/.ssh/authorized_keys')
+    if id_rsa_pub not in open(authorized_keys_path, 'r').read():
+        with open(authorized_keys_path, 'a') as f:
+            f.write('\n'+id_rsa_pub+'\n')
