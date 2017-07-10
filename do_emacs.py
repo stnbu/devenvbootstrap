@@ -96,7 +96,9 @@ if __name__ == '__main__':
         with open(dot_bashrc, 'a') as f:
             f.write('\n. ~/git/devenvbootstrap/dot.bashrc\n')
 
+    # doesn't even afraid
     system(['apt-get', '-yy', 'install', 'ipython'])
+    system(['pip', 'install', 'remote-pdb'])
 
     id_rsa_pub = open(os.path.expanduser('~/git/devenvbootstrap/id_rsa.pub'), 'r').read().strip()
     authorized_keys_path = os.path.expanduser('~/.ssh/authorized_keys')
