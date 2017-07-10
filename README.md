@@ -26,3 +26,4 @@ MISC
 * ln -s git/devenvbootstrap/dot.emacs ./.emacs
 * yum install python-ipython
 * git -c http.sslVerify=false clone
+* from remote_pdb import RemotePdb ; RemotePdb('0.0.0.0', 4444).set_trace()
