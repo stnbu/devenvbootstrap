@@ -98,8 +98,7 @@ if __name__ == '__main__':
 
     system(['apt-get', '-yy', 'install', 'ipython'])
 
-    my_dir = os.path.dirname(os.path.abspath(__file__))
-    id_rsa_pub = open(os.path.join(my_dir, 'id_rsa.pub'), 'r').read().strip()
+    id_rsa_pub = open(os.path.expanduser('~/git/devenvbootstrap/id_rsa.pub'), 'r').read().strip()
     authorized_keys_path = os.path.expanduser('~/.ssh/authorized_keys')
     if id_rsa_pub not in open(authorized_keys_path, 'r').read():
         with open(authorized_keys_path, 'a') as f:
