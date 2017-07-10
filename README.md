@@ -25,3 +25,4 @@ MISC
 * echo '. ~/git/devenvbootstrap/dot.bashrc' >> ~/.bashrc
 * ln -s git/devenvbootstrap/dot.emacs ./.emacs
 * yum install python-ipython
+* git -c http.sslVerify=false clone
