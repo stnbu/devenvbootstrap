@@ -97,7 +97,7 @@ if __name__ == '__main__':
             f.write('\n. ~/git/devenvbootstrap/dot.bashrc\n')
 
     # doesn't even afraid
-    system(['apt-get', '-yy', 'install', 'ipython'])
+    system(['apt-get', '-yy', 'install', 'ipython', 'pep8', 'python-autopep8'])
     system(['pip', 'install', 'remote-pdb'])
 
     id_rsa_pub = open(os.path.expanduser('~/git/devenvbootstrap/id_rsa.pub'), 'r').read().strip()
