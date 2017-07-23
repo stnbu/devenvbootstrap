@@ -15,6 +15,9 @@ from urllib import request
 import subprocess
 import tarfile
 import logging
+import glob
+import platform
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -51,12 +54,13 @@ def makedirs(path):
         os.makedirs(path)
 
 
-def get_downloaded_emacs_archive(dest_dir, emacs_url):
+def get_downloaded_emacs_archive_path(dest_dir, emacs_url):
     logger.info('Downloading emacs source archive')
     logger.debug('Destination: %s' % dest_dir)
-    logger.debug('URL: %s' emacs_url)
+    logger.debug('URL: %s' % emacs_url)
     dest_dir = os.path.abspath(dest_dir)
     makedirs(dest_dir)
+    archive_name = os.path.split(emacs_url)[-1]  # good enough
     dest_filename = os.path.join(dest_dir, archive_name)
     if not os.path.exists(dest_filename):
         opener = request.URLopener()
@@ -104,50 +108,56 @@ python3 do_emacs.py
 emacs --daemon
 """
 
+def rotate_away_path(path):
+    new_path = '%s.%s' % (path, time.time())
+    logger.warn('%s already exists. moving to %s' % (path, new_path))
+    os.rename(path, new_path)
+
 def get_extracted_source_root(base_dir, tarball_path):
     base_dir = os.path.abspath(base_dir)
     makedirs(base_dir)
+    emacs_source_dir, = glob.glob(os.path.join(base_dir, 'emacs', 'emacs*'))
     extract_tarball(tarball_path, emacs_source_dir)
-    emacs_source_dir, = glob(os.path.join(base_dir, 'emacs*'))
     return emacs_source_dir
 
 
-    dot_emacs = os.path.expanduser('~/.emacs')
-    dot_bashrc = os.path.expanduser('~/.bashrc')
 
 def link_dot_emacs(path):
     dot_emacs_path = os.path.expanduser('~/.emacs')
     if os.path.exists(dot_emacs_path) and os.path.islink(dot_emacs_path):
-        os.remove(path)
-    else:
-        logger.warn('~/.emacs already exists.')
-        return
-    os.symlink('git/devenvbootstrap/dot.emacs', dot_emacs)
+        rotate_away_path(dot_emacs_path)
+    os.symlink('git/devenvbootstrap/dot.emacs', dot_emacs_path)
 
 def update_dot_bashrc():
     dot_bashrc_path = os.path.expanduser('~/.bashrc')
     if not os.path.exists(dot_bashrc_path):
         with open(dot_bashrc_path, 'w') as f:
             f.close()
-    if 'devenvbootstrap' not in open(dot_bashrc).read():
-        with open(dot_bashrc, 'a') as f:
+    if 'devenvbootstrap' not in open(dot_bashrc_path).read():
+        with open(dot_bashrc_path, 'a') as f:
             f.write('\n. ~/git/devenvbootstrap/dot.bashrc\n')
 
 def get_platform():
     name, _, _ = platform.dist()
-    return name.lower()
+    name = name.lower()
+    if name == 'ubuntu':
+        name = 'debian'
+    return name
 
 
 def install_system_packages(package_aliases):
+    logger.info('Installing system packages.')
+    logger.debug('Packages to install: %s' % package_aliases)
     platform_name = get_platform()
-    to_install = [v[platform_name] for k, v in PACKAGES.iteritems() if k in package_aliases]
-    to_install = ' '.join(to_install)
-    command = 'apt-get -y -q install %s'.split()
+    to_install = [v[platform_name] for k, v in PACKAGES.items() if k in package_aliases]
+    command = 'apt-get -y -q install'.split()
     command.extend(to_install)
-    system(install_command)
+    system(command)
 
 
 def install_global_python_packages(package_names):
+    logger.info('Installing python packages.')
+    logger.debug('Packages to install: %s' % package_names)
     command = 'pip install'.split()
     command.extend(package_names)
     system(command)
@@ -155,34 +165,39 @@ def install_global_python_packages(package_names):
 def clone_repo(uri, dest_dir):
     logger.info('Cloning repository.')
     dest_dir = os.path.abspath(dest_dir)
+    if os.path.exists(dest_dir):
+        rotate_away_path(dest_dir)
     makedirs(dest_dir)
     command = 'git -c http.sslVerify=false clone'.split()
     command.append(uri)
     command.append(dest_dir)
     system(command)
 
+def install_authorized_key(key):
+    logger.info('Installing ssh key.')
+    authorized_keys_path = os.path.expanduser('~/.ssh/authorized_keys')
+    if key not in open(authorized_keys_path, 'r').read():
+        with open(authorized_keys_path, 'a') as f:
+            f.write('\n'+key)
+    
 if __name__ == '__main__':
 
-    clone_repo('https://github.com/stnbu/devenvbootstrap.git', os.path.expanduser('~/git/devenvbootstrap'))
+    install_system_packages(['ipython', 'pep8', 'autopep8', 'virtualenv'])
+    install_global_python_packages(['remote-pdb'])
 
-    tarball_path = get_downloaded_emacs_archive_path(SOURCE_ROOT)
-    emacs_source_dir = get_extracted_source_root(base_dir, tarball_path)
+    clone_repo('https://github.com/stnbu/devenvbootstrap.git', os.path.expanduser('~/git/devenvbootstrap'))
+    
+    key = open(os.path.expanduser('~/git/devenvbootstrap/id_rsa.pub'), 'r').read().strip()
+    install_authorized_key(key)
+    
+
+    tarball_path = get_downloaded_emacs_archive_path(SOURCE_ROOT, EMACS_URL)
+    emacs_source_dir = get_extracted_source_root(SOURCE_ROOT, tarball_path)
 
     configure(emacs_source_dir)
-    make(this_version_source)
-    make(this_version_source, 'install')
+    make(emacs_source_dir)
+    make(emacs_source_dir, 'install')
 
     link_dot_emacs('/root/git/devenvbootstrap/dot.emacs')
     update_dot_bashrc()
 
-    install_system_packages('ipython', 'pep8', 'autopep8', 'virtualenv')
-    install_global_python_packages('remote-pdb')
-
-
-    """
-    id_rsa_pub = open(os.path.expanduser('~/git/devenvbootstrap/id_rsa.pub'), 'r').read().strip()
-    authorized_keys_path = os.path.expanduser('~/.ssh/authorized_keys')
-    if id_rsa_pub not in open(authorized_keys_path, 'r').read():
-        with open(authorized_keys_path, 'a') as f:
-            f.write('\n'+id_rsa_pub+'\n')
-    """
