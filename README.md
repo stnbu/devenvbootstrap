@@ -27,4 +27,4 @@ MISC
 * yum install python-ipython
 * git -c http.sslVerify=false clone
 * from remote_pdb import RemotePdb ; RemotePdb('0.0.0.0', 4444).set_trace()
-* wget -O - http://tiny.cc/stnbu-devenv | /bin/sh
+* wget -O - http://tiny.cc/sdevenv | /bin/sh
