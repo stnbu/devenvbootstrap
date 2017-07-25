@@ -26,4 +26,5 @@ Notes for Me
 
 * git -c http.sslVerify=false clone
 * from remote_pdb import RemotePdb ; RemotePdb('0.0.0.0', 4444).set_trace()
+* socat readline tcp:10.175.17.66:4444
 * wget -O - http://tiny.cc/sdevenv | python3 -
