@@ -3,6 +3,7 @@
 TODO
 ----
 
+* automatic virtualenv smartness
 * the forever-appened shell history
 * ispell + dictionary  (aspell-en)
 * distro agnosticism
