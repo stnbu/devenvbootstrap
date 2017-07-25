@@ -3,6 +3,7 @@
 TODO
 ----
 
+* the forever-appened shell history
 * ispell + dictionary  (aspell-en)
 * distro agnosticism
 * install tmux, bash completion, epel(wat)
