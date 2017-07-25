@@ -3,6 +3,7 @@
 TODO
 ----
 
+* don't die if you're not root
 * automatic virtualenv smartness
 * the forever-appened shell history
 * ispell + dictionary  (aspell-en)
